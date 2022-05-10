@@ -53,17 +53,18 @@
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <Button Content="Speech"
-                        Click="speechButton_Click"/>
-                <Button x:Name="boldButton"
+                        Click="SpeechButton_Click"/>
+                <ToggleButton x:Name="boldButton"
                         Click="boldButton_Click">
                     <TextBlock Text="B"
                                FontWeight="Bold"/>
-                </Button>
+                </ToggleButton>
             </ToolBar>
         </ToolBarTray>
         <Grid>
             <RichTextBox x:Name="contentRichTextBox"
-                         TextChanged="contentRichTextBox_TextChanged"/>
+                         TextChanged="contentRichTextBox_TextChanged"
+                         SelectionChanged="contentRichTextBox_SelectionChanged"/>
         </Grid>
     </DockPanel>
 </Window>
