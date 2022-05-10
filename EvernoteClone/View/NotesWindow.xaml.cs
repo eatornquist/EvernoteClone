@@ -29,10 +29,23 @@ namespace EvernoteClone.View
             Application.Current.Shutdown();
         }
 
-        private void SpeechButton_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
+        private void contentRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int ammountCharacters = (new TextRange(contentRichTextBox.Document.ContentStart, contentRichTextBox.Document.ContentEnd)).Text.Length;
+
+            statusTextBlock.Text = $"Docmunet length: {ammountCharacters} charachters";
+        }
+
+        private void boldButton_Click(object sender, RoutedEventArgs e)
+        {
+            var textToBold = new TextRange(contentRichTextBox.Selection.Start, contentRichTextBox.Selection.End);
+
+            contentRichTextBox.Selection.ApplyPropertyValue(Inline.FontWeightProperty, FontWeights.Bold);            
+        }
     }
 }
