@@ -33,7 +33,8 @@ namespace EvernoteClone.ViewModel
         public Note SelectedNote
         {
             get { return selectedNote; }
-            set { 
+            set 
+            { 
                 selectedNote = value;
                 OnPropertyChanged("SelectedNote");
                 SelectedNoteChanged?.Invoke(this, new EventArgs());

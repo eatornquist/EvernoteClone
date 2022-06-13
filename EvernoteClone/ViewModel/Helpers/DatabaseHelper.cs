@@ -4,7 +4,6 @@ using SQLite;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,34 +47,68 @@ namespace EvernoteClone.ViewModel.Helpers
             }
         }
 
-        public static bool Update<T>(T item)
+        public static async Task<bool> Update<T>(T item) where T : HasId
         {
-            bool result = false;
+            //bool result = false;
 
-            using (SQLiteConnection conn = new SQLiteConnection(dbFile))
+            //using (SQLiteConnection conn = new SQLiteConnection(dbFile))
+            //{
+            //    conn.CreateTable<T>();
+            //    int rows = conn.Update(item);
+            //    if (rows > 0)
+            //        result = true;
+            //}
+
+            //return result;
+
+            string jsonBody = JsonConvert.SerializeObject(item);
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
             {
-                conn.CreateTable<T>();
-                int rows = conn.Update(item);
-                if (rows > 0)
-                    result = true;
-            }
+                var result = await client.PatchAsync($"{dbPath}{item.GetType().Name.ToLower()}/{item.Id}.json", content);
 
-            return result;
+                if (result.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
-        public static bool Delete<T>(T item)
+        public static async Task<bool> Delete<T>(T item) where T : HasId
         {
-            bool result = false;
+            //bool result = false;
 
-            using (SQLiteConnection conn = new SQLiteConnection(dbFile))
+            //using (SQLiteConnection conn = new SQLiteConnection(dbFile))
+            //{
+            //    conn.CreateTable<T>();
+            //    int rows = conn.Delete(item);
+            //    if (rows > 0)
+            //        result = true;
+            //}
+
+            //return result;
+
+            string jsonBody = JsonConvert.SerializeObject(item);
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
             {
-                conn.CreateTable<T>();
-                int rows = conn.Delete(item);
-                if (rows > 0)
-                    result = true;
-            }
+                var result = await client.DeleteAsync($"{dbPath}{item.GetType().Name.ToLower()}/{item.Id}.json");
 
-            return result;
+                if (result.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         public static async Task<List<T>> Read<T>() where T : HasId
