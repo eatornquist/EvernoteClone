@@ -1,4 +1,5 @@
-﻿using EvernoteClone.ViewModel;
+﻿using Azure.Storage.Blobs;
+using EvernoteClone.ViewModel;
 using EvernoteClone.ViewModel.Helpers;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -172,18 +173,35 @@ namespace EvernoteClone.View
         }
                
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            string rtfFile = System.IO.Path.Combine(Environment.CurrentDirectory, $"{viewModel.SelectedNote.Id}.rtf");
-            viewModel.SelectedNote.FileLocation = rtfFile;
-            DatabaseHelper.Update(viewModel.SelectedNote);
+            string fileName = $"{viewModel.SelectedNote.Id}.rtf";
+            string rtfFile = System.IO.Path.Combine(Environment.CurrentDirectory, fileName);            
+            
 
             using (FileStream filestream = new FileStream(rtfFile, FileMode.Create))
             {
                 var contents = new TextRange(contentRichTextBox.Document.ContentStart, contentRichTextBox.Document.ContentEnd);
                 contents.Save(filestream, DataFormats.Rtf);
             }
-                
+
+            viewModel.SelectedNote.FileLocation = await UpdateFile(rtfFile, fileName);
+            await DatabaseHelper.Update(viewModel.SelectedNote);
+
+        }
+
+        private async Task<string> UpdateFile(string rtfFilePath, string fileName)
+        {
+            string connectionString = "DefaultEndpointsProtocol=https;AccountName=evernotestoragelpa2;AccountKey=SJpnnMZ3+RHjSwONeDiBopSiXk/N/xhKrZb+AywJM2lwkHwlUu45dkodhODvRcxEEaWou9OlQuBK+AStI80fxQ==;EndpointSuffix=core.windows.net";
+            string containerName = "notes";
+
+            var container = new BlobContainerClient(connectionString, containerName);
+           // container.CreateIfNotExistsAsync();
+
+            var blob = container.GetBlobClient(fileName);
+            await blob.UploadAsync(rtfFilePath);
+
+            return $"https://evernotestoragelpa2.blob.core.windows.net/notes/{fileName}";
         }
     }
 }
